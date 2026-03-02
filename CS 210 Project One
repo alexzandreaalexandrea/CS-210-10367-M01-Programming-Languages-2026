@@ -1,0 +1,244 @@
+/*
+ * Alexzandrea Joseph
+ * Project 1
+ * January 18th, 2026
+ *
+ */
+
+#include <iostream>
+#include <string>
+using namespace std;
+
+// global time storage
+unsigned int g_hour = 0;
+unsigned int g_minute = 0;
+unsigned int g_second = 0;
+
+unsigned int getHour() {return g_hour;}
+unsigned int getMinute() {return g_minute;}
+unsigned int getSecond() {return g_second;}
+
+void setHour(unsigned int h) {g_hour = h;}
+void setMinute(unsigned int m) {g_minute = m;}
+void setSecond(unsigned int s) {g_second = s;}
+
+//helper functions
+string twoDigitString(unsigned int n) {
+    if (n < 10) {
+        return "0" + to_string(n);
+    } else {
+        return to_string(n);
+    }
+}
+
+string nCharString(size_t n, char c) {
+    return string(n, c);
+}
+
+// time formatting
+string formatTime24(unsigned int h, unsigned int m, unsigned int s) {
+            //convert each part to a two-digit string
+    string hh = twoDigitString(h);
+    string mm = twoDigitString(m);
+    string ss = twoDigitString(s);
+
+            //put it all together hh:mm:ss format
+    return hh + ":" + mm + ":" + ss;
+}
+
+string formatTime12(unsigned int h, unsigned int m, unsigned int s) {
+    string period;
+    unsigned int hour12;
+
+    //is it AM or PM?
+    if (h < 12) {
+        period = "A M";
+    }
+    else {
+        period = "P M";
+    }
+
+    //convert 24hr to 12hr time
+    if (h == 0) {
+        hour12 = 12;
+    }
+    else if (h > 12) {
+        hour12 = h - 12;
+    }
+    else {
+        hour12 = h;
+    }
+
+    //create the formatted string
+    string hh = twoDigitString(hour12);
+    string mm = twoDigitString(m);
+    string ss = twoDigitString(s);
+
+    return hh + ":" + mm + ":" + ss + " " + period;
+}
+
+//time increment functions
+void addOneSecond();
+void addOneMinute();
+void addOneHour();
+
+void addOneSecond() {
+    unsigned int sec = getSecond();
+
+    if (sec < 59) {
+        //normal increment, add 1
+        setSecond(sec + 1);
+    }
+    else {
+        //if second is 59, go to 0 and add a minute
+        setSecond(0);
+        addOneMinute();
+    }
+}
+void addOneMinute() {
+    unsigned int min = getMinute();
+
+    if (min < 59) {
+        //normal increment, add 1
+        setMinute(min + 1);
+    }
+    else {
+        // if minute 59 change to 0 and add an hour
+        setMinute(0);
+        addOneHour();
+    }
+}
+void addOneHour() {
+    unsigned int hr = getHour();
+
+    if (hr < 23) {
+        //normal increment
+        setHour(hr + 1);
+    }
+    else {
+        //if hour is 23 change to 0
+        setHour(0);
+    }
+}
+
+void printMenu(char * strings[], unsigned int numStrings, unsigned char width) {
+    //print the top row of astericks
+    cout << nCharString(width, '*') << endl;
+
+    //loop through each menu item
+    for (unsigned int i = 0; i < numStrings; i++) {
+
+        //convert index to 1 based numbering for display
+        unsigned int itemNumber = i + 1;
+
+        //make the left side: "* num - string"
+        string leftSide = "* " + to_string(itemNumber) + " - " + string(strings[i]);
+
+        //calculate how many spaces are needed before end of *
+        unsigned int spacesNeeded = width - 1 - leftSide.length();
+
+        //print whole line
+        cout << leftSide << nCharString(spacesNeeded, ' ') << "*" << endl;
+
+        //print blank line after all except the last item
+        if (i < numStrings - 1) {
+            cout << endl;
+        }
+    }
+    //print the bottom asterick border
+    cout << nCharString(width, '*') << endl;
+}
+//// menu input
+unsigned int getMenuChoice(unsigned int maxChoice) {
+    unsigned int choice;
+
+    //loop until user inputs a valid number
+    while (true) {
+        cin >> choice;
+
+        //check if input is valid and in range
+        if (choice >= 1 && choice <= maxChoice) {
+            return choice;
+        }
+    }
+}
+
+    // clock display
+void displayClocks(unsigned int h, unsigned int m, unsigned int s) {
+    // Line 1: 27 astericks, 3 spaces, 27 astericks
+    cout << nCharString(27, '*') << nCharString(3, ' ') << nCharString(27, '*') << endl;
+
+    //Line 2: 1 asterick, 6 spaces, 12-hour clock, 6 spaces, asterick, 3 spaces and Line 3
+    cout << "*" << nCharString(6, ' ') << "12-HOUR CLOCK" << nCharString(6, ' ') << "*" << nCharString(3, ' ') << "*" << nCharString(6, ' ') << "24-HOUR CLOCK" << nCharString(6, ' ') << "*" << endl;
+
+    //Line 4: blank line
+    cout << endl;
+
+    //Line 5: 1 asterick, 6 spaces, formatted time in 12 hour format, 7 spaces, 1 asterick, 3 spaces and Line 6
+    cout << "*" << nCharString(6, ' ') << formatTime12(h, m, s) << nCharString(7, ' ') << "*" << nCharString(3, ' ') << "*" << nCharString(8, ' ') << formatTime24(h, m, s) << nCharString(9, ' ') << "*" << endl;
+
+    //Line 7: 27 astericks, 3 spaces, 27 astericks
+    cout << nCharString(27, '*') << nCharString(3, ' ') << nCharString(27, '*') << endl;
+}
+
+//main menu loop
+void mainMenu() {
+    unsigned int choice = 0;
+
+    char* menuItems[] = {
+        (char*)"Add One Hour",
+        (char*)"Add One Minute",
+        (char*)"Add One Second",
+        (char*)"ExitProgram"
+    };
+
+    //repeat until user chooses 4
+    while (choice != 4) {
+
+        //show clocks
+        displayClocks(getHour(), getMinute(), getSecond());
+
+        //show menu
+        printMenu(menuItems, 4, 26);
+
+        //get user choice 1-4
+        choice = getMenuChoice(4);
+
+        //do one of the following based on choice
+        if (choice == 1) {
+            addOneHour();
+        }
+        else if (choice == 2) {
+            addOneMinute();
+        }
+        else if (choice == 3) {
+            addOneSecond();
+        }
+    }
+}
+
+int main() {
+    unsigned int h, m, s;
+
+    //ask for initial time
+    cout << "Enter starting hour (0-23): ";
+    cin >> h;
+
+    cout << "Enter starting minute (0-59): ";
+    cin >> m;
+
+    cout << "Enter starting second (0-59): ";
+    cin >> s;
+
+    //store values
+    setHour(h);
+    setMinute(m);
+    setSecond(s);
+
+    //start menu loop
+    mainMenu();
+
+    return 0;
+}
+
+
