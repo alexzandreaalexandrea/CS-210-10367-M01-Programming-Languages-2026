@@ -1,0 +1,69 @@
+//Alexzandrea Joseph
+//Professor Linda Noss
+//CS 210 Project Three
+//February 22, 2026
+
+#include <iostream>
+#include <string>  //added for the numeric_limits i used in input cleanup
+#include "GroceryTracker.h" //include class header
+
+
+using namespace std;
+
+int main() {
+    GroceryTracker tracker("CS210_Project_Three_Input_File.txt", "frequency.dat");
+
+    //create GroceryTracker object with input file and backup file names
+    tracker.LoadData(); //load every item from the input file
+    tracker.WriteBackupFile(); //write frequency data to the backup file
+
+    int choice = 0; //store the user's menu choice
+
+    //display all 4 menu options
+    while (choice != 4) {
+        cout << "\n===== Corner Grocer Menu =====\n";
+        cout << "1. Search for an item\n";
+        cout << "2. Print all item frequencies\n";
+        cout << "3. Print histogram\n";
+        cout << "4. Exit\n";
+        cout << "Enter your choice: ";
+
+        cin >> choice; // read the user's input for menu choice
+
+        //I added this to clear any leftover input because the menu kept repeating itself
+        cin.clear();
+        cin.ignore(numeric_limits<streamsize>::max(), '\n');
+
+        cout << endl;
+
+        //process the user's menu selection
+        switch (choice) {
+
+            case 1: { //search for a specific item for example "Cabbage"
+                string item;
+                cout << "Enter item: ";
+                getline(cin, item);
+                cout << item << " appears " << tracker.GetItemFrequency(item) << " times.\n"; //display how many times the item appears in input file
+                break;
+            }
+            case 2:
+                //print all items and their frequencies
+                tracker.PrintAllFrequencies();
+                break;
+
+            case 3:
+                //print histogram with asterisks
+                tracker.PrintHistogram();
+                break;
+
+            case 4:
+                //exit message
+                cout << "Exit program. \n";
+                break;
+
+            default:
+                //this is to handle invalid menu selections
+                cout << "Invalid choice. Try again. \n";
+        }
+    }
+    return 0; //end of program
